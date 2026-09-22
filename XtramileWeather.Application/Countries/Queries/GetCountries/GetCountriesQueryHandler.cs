@@ -4,18 +4,18 @@ using XtramileWeather.Application.Common.Interfaces;
 
 namespace XtramileWeather.Application.Countries.Queries.GetCountries;
 
-public sealed class GetCountriesQueryHandler
-    : IRequestHandler<GetCountriesQuery, IReadOnlyList<CountryDto>>
+public sealed class GetCurrentWeatherQueryHandler
+    : IRequestHandler<GetCurrentWeatherQuery, IReadOnlyList<CountryDto>>
 {
     private readonly IAppDbContext _context;
 
-    public GetCountriesQueryHandler(IAppDbContext context)
+    public GetCurrentWeatherQueryHandler(IAppDbContext context)
     {
         _context = context;
     }
 
     public async Task<IReadOnlyList<CountryDto>> Handle(
-        GetCountriesQuery request,
+        GetCurrentWeatherQuery request,
         CancellationToken cancellationToken)
     {
         return await _context.Countries

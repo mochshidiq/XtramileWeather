@@ -1,5 +1,8 @@
 using XtramileWeather.Infrastructure;
 using XtramileWeather.Application.Countries.Queries.GetCountries;
+using Microsoft.Extensions.Options;
+using XtramileWeather.Application.Common.Interfaces;
+using XtramileWeather.Infrastructure.Weather;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,7 +22,21 @@ builder.Services.AddInfrastructure(connectionString);
 
 builder.Services.AddMediatR(configuration =>
     configuration.RegisterServicesFromAssembly(
-        typeof(GetCountriesQuery).Assembly));
+        typeof(GetCurrentWeatherQuery).Assembly));
+
+builder.Services.Configure<OpenWeatherOptions>(
+    builder.Configuration.GetSection(
+        OpenWeatherOptions.SectionName));
+
+builder.Services.AddHttpClient<IWeatherService, OpenWeatherService>(
+    (serviceProvider, httpClient) =>
+    {
+        var options = serviceProvider
+            .GetRequiredService<IOptions<OpenWeatherOptions>>()
+            .Value;
+
+        httpClient.BaseAddress = new Uri(options.BaseUrl);
+    });
 
 var app = builder.Build();
 

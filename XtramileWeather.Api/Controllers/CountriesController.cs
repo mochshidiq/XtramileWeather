@@ -24,7 +24,7 @@ public sealed class CountriesController : ControllerBase
         CancellationToken cancellationToken)
     {
         var countries = await _sender.Send(
-            new GetCountriesQuery(),
+            new GetCurrentWeatherQuery(),
             cancellationToken);
 
         return Ok(countries);
