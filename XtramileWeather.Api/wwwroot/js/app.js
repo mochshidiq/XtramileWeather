@@ -16,6 +16,12 @@ const favoriteList =
 const statusMessage =
     document.getElementById("statusMessage");
 
+const unitToggleButton =
+    document.getElementById("unitToggleButton");
+
+let currentWeather = null;
+let selectedUnit = "C";
+
 document.addEventListener("DOMContentLoaded", async () => {
     bindEvents();
 
@@ -36,6 +42,10 @@ function bindEvents() {
     addFavoriteButton.addEventListener(
         "click",
         addFavorite);
+
+    unitToggleButton.addEventListener(
+        "click",
+        toggleTemperatureUnit);
 }
 
 async function apiRequest(url, options = {}) {
@@ -62,7 +72,7 @@ async function apiRequest(url, options = {}) {
         const message =
             typeof data === "string"
                 ? data
-                : data?.message;
+                : data?.message || data?.detail;
 
         throw new Error(
             message || `Request failed with status ${response.status}.`);
@@ -140,53 +150,15 @@ async function loadWeather() {
     showStatus("Loading weather...");
 
     try {
-        const weather = await apiRequest(
+        currentWeather = await apiRequest(
             `/api/weather/${cityId}`);
 
-        weatherResult.innerHTML = `
-            <h3>
-                ${escapeHtml(weather.cityName)},
-                ${escapeHtml(weather.countryCode)}
-            </h3>
+        selectedUnit = "C";
+        renderWeather();
 
-            <div class="temperature">
-                ${formatNumber(weather.temperatureCelsius)} °C
-            </div>
+        unitToggleButton.classList.remove("hidden");
+        unitToggleButton.textContent = "Switch to °F";
 
-            <p>${escapeHtml(weather.description)}</p>
-
-            <div class="weather-details">
-                <span>
-                    Feels like:
-                    ${formatNumber(weather.feelsLikeCelsius)} °C
-                </span>
-
-                <span>
-                    Humidity:
-                    ${weather.humidity}%
-                </span>
-
-                <span>
-                    Minimum:
-                    ${formatNumber(
-            weather.minimumTemperatureCelsius)} °C
-                </span>
-
-                <span>
-                    Maximum:
-                    ${formatNumber(
-                weather.maximumTemperatureCelsius)} °C
-                </span>
-
-                <span>
-                    Wind:
-                    ${formatNumber(
-                    weather.windSpeedMetersPerSecond)} m/s
-                </span>
-            </div>
-        `;
-
-        weatherResult.classList.remove("hidden");
         showStatus("");
     } catch (error) {
         resetWeather();
@@ -275,8 +247,12 @@ async function deleteFavorite(favoriteId) {
 }
 
 function resetWeather() {
+    currentWeather = null;
+
     weatherResult.classList.add("hidden");
     weatherResult.innerHTML = "";
+
+    unitToggleButton.classList.add("hidden");
 }
 
 function showStatus(message, isError = false) {
@@ -292,4 +268,128 @@ function escapeHtml(value) {
     const element = document.createElement("div");
     element.textContent = value ?? "";
     return element.innerHTML;
+}
+
+function toggleTemperatureUnit() {
+    selectedUnit =
+        selectedUnit === "C" ? "F" : "C";
+
+    unitToggleButton.textContent =
+        selectedUnit === "C"
+            ? "Switch to °F"
+            : "Switch to °C";
+
+    renderWeather();
+}
+
+function renderWeather() {
+    if (!currentWeather) {
+        return;
+    }
+
+    const isCelsius = selectedUnit === "C";
+    const symbol = isCelsius ? "°C" : "°F";
+
+    const temperature = isCelsius
+        ? currentWeather.temperatureCelsius
+        : currentWeather.temperatureFahrenheit;
+
+    const feelsLike = isCelsius
+        ? currentWeather.feelsLikeCelsius
+        : currentWeather.feelsLikeFahrenheit;
+
+    const minimum = isCelsius
+        ? currentWeather.minimumTemperatureCelsius
+        : currentWeather.minimumTemperatureFahrenheit;
+
+    const maximum = isCelsius
+        ? currentWeather.maximumTemperatureCelsius
+        : currentWeather.maximumTemperatureFahrenheit;
+
+    const dewPoint = isCelsius
+        ? currentWeather.dewPointCelsius
+        : currentWeather.dewPointFahrenheit;
+
+    const visibilityKilometers =
+        currentWeather.visibilityMeters / 1000;
+
+    weatherResult.innerHTML = `
+        <h3>
+            ${escapeHtml(currentWeather.cityName)},
+            ${escapeHtml(currentWeather.countryCode)}
+        </h3>
+
+        <div class="temperature">
+            ${formatNumber(temperature)} ${symbol}
+        </div>
+
+        <p>
+            ${escapeHtml(currentWeather.sky)} —
+            ${escapeHtml(currentWeather.description)}
+        </p>
+
+        <div class="weather-details">
+            <span>
+                Feels like:
+                ${formatNumber(feelsLike)} ${symbol}
+            </span>
+
+            <span>
+                Minimum:
+                ${formatNumber(minimum)} ${symbol}
+            </span>
+
+            <span>
+                Maximum:
+                ${formatNumber(maximum)} ${symbol}
+            </span>
+
+            <span>
+                Dew point:
+                ${formatNumber(dewPoint)} ${symbol}
+            </span>
+
+            <span>
+                Humidity:
+                ${currentWeather.humidity}%
+            </span>
+
+            <span>
+                Pressure:
+                ${currentWeather.pressureHpa} hPa
+            </span>
+
+            <span>
+                Visibility:
+                ${formatNumber(visibilityKilometers)} km
+            </span>
+
+            <span>
+                Wind:
+                ${formatNumber(
+        currentWeather.windSpeedMetersPerSecond)} m/s
+            </span>
+
+            <span>
+                Observed:
+                ${formatUtc(currentWeather.observedAtUtc)}
+            </span>
+        </div>
+    `;
+
+    weatherResult.classList.remove("hidden");
+}
+
+function formatUtc(value) {
+    const date = new Date(value);
+
+    return `${date.toLocaleString("en-GB", {
+        timeZone: "UTC",
+        year: "numeric",
+        month: "short",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false
+    })} UTC`;
 }

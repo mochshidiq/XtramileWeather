@@ -3,6 +3,7 @@ using XtramileWeather.Application.Countries.Queries.GetCountries;
 using Microsoft.Extensions.Options;
 using XtramileWeather.Application.Common.Interfaces;
 using XtramileWeather.Infrastructure.Weather;
+using XtramileWeather.Api.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -46,6 +47,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+
+app.UseHttpsRedirection();
+app.UseDefaultFiles();
+app.UseStaticFiles();
 
 app.UseHttpsRedirection();
 

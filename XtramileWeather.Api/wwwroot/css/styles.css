@@ -154,3 +154,9 @@ button {
         flex-direction: column;
     }
 }
+
+.unit-switch {
+    margin-top: 12px;
+    color: white;
+    background: #0f766e;
+}
