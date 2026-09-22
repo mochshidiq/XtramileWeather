@@ -1,4 +1,5 @@
 using XtramileWeather.Infrastructure;
+using XtramileWeather.Application.Countries.Queries.GetCountries;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +16,10 @@ var connectionString =
         "DefaultConnection is not configured.");
 
 builder.Services.AddInfrastructure(connectionString);
+
+builder.Services.AddMediatR(configuration =>
+    configuration.RegisterServicesFromAssembly(
+        typeof(GetCountriesQuery).Assembly));
 
 var app = builder.Build();
 
