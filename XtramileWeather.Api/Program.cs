@@ -49,6 +49,12 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseDefaultFiles();
+app.UseStaticFiles();
+
+app.UseAuthorization();
+app.MapControllers();
+
 app.UseAuthorization();
 
 app.MapControllers();
