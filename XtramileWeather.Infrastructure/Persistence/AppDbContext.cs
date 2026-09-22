@@ -73,6 +73,24 @@ namespace XtramileWeather.Infrastructure.Persistence
                 entity.Property(x => x.CreatedAtUtc)
                     .IsRequired();
             });
+
+            modelBuilder.Entity<Country>().HasData(
+                new Country { Id = 1, Code = "ID", Name = "Indonesia" },
+                new Country { Id = 2, Code = "AU", Name = "Australia" },
+                new Country { Id = 3, Code = "SG", Name = "Singapore" }
+            );
+
+            modelBuilder.Entity<City>().HasData(
+                new City { Id = 1, Name = "Jakarta", CountryId = 1 },
+                new City { Id = 2, Name = "Bandung", CountryId = 1 },
+                new City { Id = 3, Name = "Surabaya", CountryId = 1 },
+
+                new City { Id = 4, Name = "Sydney", CountryId = 2 },
+                new City { Id = 5, Name = "Melbourne", CountryId = 2 },
+                new City { Id = 6, Name = "Brisbane", CountryId = 2 },
+
+                new City { Id = 7, Name = "Singapore", CountryId = 3 }
+            );
         }
     }
 }
