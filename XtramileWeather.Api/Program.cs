@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using XtramileWeather.Application.Common.Interfaces;
 using XtramileWeather.Infrastructure.Weather;
 using XtramileWeather.Api.Middleware;
+using XtramileWeather.Application.Weather.Queries.GetCurrentWeather;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -1,21 +1,22 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
 using XtramileWeather.Application.Common.Interfaces;
+using XtramileWeather.Application.Countries.Queries.GetCountries;
 
 namespace XtramileWeather.Application.Countries.Queries.GetCountries;
 
-public sealed class GetCurrentWeatherQueryHandler
-    : IRequestHandler<GetCurrentWeatherQuery, IReadOnlyList<CountryDto>>
+public sealed class GetCountriesQueryHandler
+    : IRequestHandler<GetCountriesQuery, IReadOnlyList<CountryDto>>
 {
     private readonly IAppDbContext _context;
 
-    public GetCurrentWeatherQueryHandler(IAppDbContext context)
+    public GetCountriesQueryHandler(IAppDbContext context)
     {
         _context = context;
     }
 
     public async Task<IReadOnlyList<CountryDto>> Handle(
-        GetCurrentWeatherQuery request,
+        GetCountriesQuery request,
         CancellationToken cancellationToken)
     {
         return await _context.Countries

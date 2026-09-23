@@ -2,5 +2,5 @@
 
 namespace XtramileWeather.Application.Countries.Queries.GetCountries;
 
-public sealed record GetCurrentWeatherQuery
+public sealed record GetCountriesQuery
     : IRequest<IReadOnlyList<CountryDto>>;
